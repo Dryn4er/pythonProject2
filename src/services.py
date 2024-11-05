@@ -55,12 +55,12 @@ except Exception as e:
     print(f"Ошибка с созданием списка словарей: {e}.")
 
 
-def investment_bank(month: str, list_transactions: List[Dict[str, Any]], limit: int):
+def bank_investments(month: str, list_transactions: List[Dict[str, Any]], limit: int):
     """На вход принимаем месяц, транзакции, кратная сумма, до которой округляем.
     Каждая покупка округляется до кратной суммы
-    и падает в counter, возвращается counter"""
+    и падает в counter"""
     try:
-        logger.info("Кругленькая сумма получилась...")
+        logger.info("Общая сумма")
         counter = 0
         for i in list_transactions:
             if i["Дата платежа"] is None:
@@ -88,9 +88,9 @@ def investment_bank(month: str, list_transactions: List[Dict[str, Any]], limit: 
         json_counter = json.dumps(float(counter), ensure_ascii=False)
         return json_counter
     except Exception as e:
-        logger.error(f"Ничего ты не сэкономил: {e}.")
-        print(f"Ничего ты не сэкономил: {e}.")
+        logger.error(f"Нет сэкономленных средств: {e}.")
+        print(f"Нет сэкономленных средств: {e}.")
 
 
 if __name__ == "__main__":
-    print(investment_bank(str_date_service, transactions, 50))
+    print(bank_investments(str_date_service, transactions, 50))

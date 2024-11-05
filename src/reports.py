@@ -41,7 +41,7 @@ def my_decorator(func):
 
 
 def decorator_with_args(file):
-    def my_big_decorator(func):
+    def big_decorator(func):
         def wrapper(*args, **kwargs):
             try:
                 logger.info("Записываем данные в файл 'spending_by_weekday_2.json'")
@@ -55,12 +55,12 @@ def decorator_with_args(file):
 
         return wrapper
 
-    return my_big_decorator
+    return big_decorator
 
 
 @decorator_with_args(path_to_json_2)
 def spending_by_weekday(file, date="14.10.2022"):
-    """Функция возвращает средние траты в каждый из дней недели за последние три месяца (от переданной даты)"""
+    """Функция возвращает средние траты в каждый из дней недели за последние три месяца"""
     try:
         logger.info("Получаем информацию из reports.")
         transactions = []

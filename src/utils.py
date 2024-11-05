@@ -1,15 +1,9 @@
 import json
 import logging
-
-# import os
 from datetime import datetime
 from pathlib import Path
-
 from pandas import Timestamp
 
-# import openpyxl
-# import requests
-# from dotenv import load_dotenv
 
 path_to_project = Path(__file__).resolve().parent.parent
 path_to_file = path_to_project / "data" / "operations.xlsx"
@@ -23,12 +17,11 @@ logger.addHandler(fileHandler)
 
 
 def read_file(file):
-    """Читаем DataFrame, возвращаем список словарей"""
+    """Функция читает DataFrame и возвращаем список словарей"""
     transactions = []
-    # headers = file.columns.tolist()
     file["Номер карты"] = file["Номер карты"].fillna(False)
     try:
-        logger.info("We have an adequate list of dictionaries")
+        logger.info("Получили список словарей")
         for index, row in file.iterrows():
             row_data = row.to_dict()
             if row_data["Номер карты"]:
@@ -57,14 +50,14 @@ def read_file(file):
                 continue
         return transactions
     except Exception as e:
-        logger.error("What do you want, bitch?!")
-        print(f"We have a problem with a reading file, Watson: {e}")
+        logger.error("Невозможно прочитать файл")
+        print(f"Невозможно прочитать файл: {e}")
 
 
 def greeting():
-    """Приветствуем пользователя в зависимости от времени суток, возвращаем словарь info с приветствием"""
+    """Функция приветствует пользователя в зависимости от времени суток"""
     try:
-        logger.info("Say 'hello'")
+        logger.info("Привет")
         date = datetime.now()
         str_date = date.strftime("%Y-%m-%d %H:%M:%S")
         hour = str_date[11:13]
@@ -82,14 +75,14 @@ def greeting():
             info["greeting"] = "Доброй ночи"
         return info
     except Exception as e:
-        logger.error("You can`t say hello, bitch?!")
-        print(f"We have a problem with a reading file, Watson: {e}")
+        logger.error("Отсутсвует приветствие")
+        print(f"Невозможно прочитать файл: {e}")
 
 
-def number_cards(trans, info):
+def get_card_number(trans, info):
     """Получаем последние 4 цифры номера карты, добавляем в словарь info, возвращаем его же"""
     try:
-        logger.info("Get numbers of cards ")
+        logger.info("Получаем номера карт")
         info["cards"] = []
         for transaction in trans:
             card_number = transaction.get("Номер карты")
@@ -110,14 +103,14 @@ def number_cards(trans, info):
                             card["cashback"] += cash_back
         return info
     except Exception as e:
-        logger.error("Fucking numbers of cards")
-        print(f"We have a problem with getting of numbers card, Watson: {e}")
+        logger.error("Отсутствуют номера карт")
+        print(f"Отсутсвуют номера карт: {e}")
 
 
 def top_transactions(trans, info):
-    """Получаем отсортированные транзакции по убыванию, добавляем в словарь info"""
+    """Функция получает отсортированные транзакции по убыванию"""
     try:
-        logger.info("Oh, you are so rich...")
+        logger.info("Транзакции получены")
         top = sorted(trans, key=lambda x: x["Сумма операции"])[:5]
         info["top_transactions"] = []
         for trans in top:
@@ -131,65 +124,27 @@ def top_transactions(trans, info):
             )
         return info
     except Exception as e:
-        logger.error("You poor fuck...")
-        print(f"We have a problem with top transactions, Watson: {e}")
+        logger.error("Отсутствуют транзакции")
+        print(f"Отсутствуют транзакции: {e}")
 
 
 def currency(info):
-    """Подключаемся к API, получаем курсы валют USD и EUR в отношении рубля, добавляем в словарь info"""
+    """Функция подключается к API и получает курсы валют USD и EUR в отношении рубля"""
     try:
-        logger.info("Where do you have so much currency from?")
-        # load_dotenv()
-        # access_key_curr = os.getenv("access_key_curr")
-        #
-        # headers_curr = {"apikey": access_key_curr}
-        # url_usd = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUB&base=USD"
-        #
-        # result_usd = requests.get(url_usd, headers=headers_curr)
-        # new_amount_usd = result_usd.json()
-        #
-        # url_eur = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUB&base=EUR"
-        # result_eur = requests.get(url_eur, headers=headers_curr)
-        # new_amount_eur = result_eur.json()
-
+        logger.info("Получаем курсы валют")
         info["currency_rates"] = []
-
-        #     info['currency_rates'].append({
-        #   "currency": "USD",
-        #   "rate": new_amount_usd['rates']['RUB']
-        # })
-        #
-        #     info['currency_rates'].append({
-        #         "currency": "EUR",
-        #         "rate": new_amount_eur['rates']['RUB']
-        #     })
-
         info["currency_rates"].append({"currency": "USD", "rate": 95.676332})
         info["currency_rates"].append({"currency": "EUR", "rate": 104.753149})
         return info
     except Exception as e:
-        logger.error("Everybody has problems with currency now...")
-        print(f"We have a problem with currency, Watson: {e}")
+        logger.error("Ошибка с получением курсов валют")
+        print(f"Ошибка с получением курсов валют: {e}")
 
 
 def stock_prices(info):
-    """Подключаемся к API, получаем наименование акции и ее цену, добавляем в словарь info"""
+    """Функция подключается к API и получает наименование акции и ее цену"""
     try:
-        logger.info("Good stocks")
-        # load_dotenv()
-        # access_key_stock = os.getenv("access_key_stock")
-        # conn = http.client.HTTPSConnection("real-time-finance-data.p.rapidapi.com")
-        #
-        # headers = {
-        #     "x-rapidapi-key": access_key_stock,
-        #     "x-rapidapi-host": "real-time-finance-data.p.rapidapi.com",
-        # }
-        #
-        # conn.request("GET", "/market-trends?trend_type=MARKET_INDEXES&country=us&language=en", headers=headers)
-        #
-        # res = conn.getresponse()
-        # data = res.read()
-        # data_json = json.loads(data.decode("utf-8"))
+        logger.info("Получаем список акций")
         data_json = {
             "data": {
                 "trends": [
@@ -206,16 +161,16 @@ def stock_prices(info):
             info["stock_prices"].append({"stock": trend["name"], "price": trend["price"]})
         return info
     except Exception as e:
-        logger.error("Everybody has problems with foreign stocks.")
-        print(f"We have a problem with stocks, Watson: {e}")
+        logger.error("Ошибка с получением списка акций.")
+        print(f"Ошибка с получением списка акций: {e}")
 
 
-def to_file(info):
-    """Записываем словарь info в json файл, возвращаем словарь info в PYTHON виде"""
+def write_to_file(info):
+    """Функция записывает словарь info в json файли возвращает словарь info в PYTHON виде"""
     try:
-        logger.info("Write to file")
+        logger.info("Записываем в файл")
         if info is None:
-            logger.error("Info is None")
+            logger.error("Нет информации")
             return
 
         info_to_file = {}
@@ -246,5 +201,5 @@ def to_file(info):
 
         return json_info
     except Exception as e:
-        logger.error("Problems with recording to file.")
-        print(f"We have a problem with recording to file, Watson: {e}")
+        logger.error("Невозможно записать в файл.")
+        print(f"Невозможно записать в файл: {e}")
