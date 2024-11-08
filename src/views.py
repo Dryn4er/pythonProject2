@@ -5,11 +5,11 @@ import pandas as pd
 from src.utils import (
     currency,
     greeting,
-    number_cards,
+    get_card_number,
     path_to_file,
     read_file,
     stock_prices,
-    to_file,
+    write_to_file,
     top_transactions,
 )
 
@@ -18,7 +18,7 @@ str_begin_date = datetime.strftime(begin_date, "%Y-%m-%d %H:%M:%S")
 
 
 def get_operations() -> pd.DataFrame:
-    """Читаем файл Excel"""
+    """Функция читает файл Excel"""
     df = pd.read_excel(path_to_file)
 
     datetime_fields_to_convert = {
@@ -40,7 +40,7 @@ def filter_operations_by_date(df: pd.DataFrame, date: str):
 
 
 def main(analysis_date):
-    """Получаем транзакции из Excel файла, фильтрованные по дате"""
+    """Функция получает транзакции из Excel файла, отфильтрованные по дате"""
     object_date = datetime.strptime(analysis_date, "%Y-%m-%d %H:%M:%S")
     new_analysis_date = datetime.strftime(object_date, "%d-%m-%Y %H:%M:%S")
     df = get_operations()
@@ -50,11 +50,11 @@ def main(analysis_date):
 
 if __name__ == "__main__":
     print(
-        to_file(
+        write_to_file(
             stock_prices(
                 currency(
                     top_transactions(
-                        read_file(main(str_begin_date)), number_cards(read_file(main(str_begin_date)), greeting())
+                        read_file(main(str_begin_date)), get_card_number(read_file(main(str_begin_date)), greeting())
                     )
                 )
             )
