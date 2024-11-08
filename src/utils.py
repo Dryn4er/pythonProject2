@@ -1,7 +1,11 @@
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
+import http.client
+import requests
+from dotenv import load_dotenv
 from pandas import Timestamp
 
 
@@ -132,7 +136,18 @@ def currency(info):
     """Функция подключается к API и получает курсы валют USD и EUR в отношении рубля"""
     try:
         logger.info("Получаем курсы валют")
+        load_dotenv()
+        access_key_curr = os.getenv("access_key_curr")
+        headers_curr = {"apikey": access_key_curr}
+        url_usd = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUB&base=USD"
+        result_usd = requests.get(url_usd, headers=headers_curr)
+        new_amount_usd = result_usd.json()
+        url_eur = f"https://api.apilayer.com/exchangerates_data/latest?symbols=RUB&base=EUR"
+        result_eur = requests.get(url_eur, headers=headers_curr)
+        new_amount_eur = result_eur.json()
         info["currency_rates"] = []
+        info['currency_rates'].append({"currency": "USD","rate": new_amount_usd['rates']['RUB']})
+        info['currency_rates'].append({"currency": "EUR","rate": new_amount_eur['rates']['RUB']})
         info["currency_rates"].append({"currency": "USD", "rate": 95.676332})
         info["currency_rates"].append({"currency": "EUR", "rate": 104.753149})
         return info
@@ -145,6 +160,14 @@ def stock_prices(info):
     """Функция подключается к API и получает наименование акции и ее цену"""
     try:
         logger.info("Получаем список акций")
+        load_dotenv()
+        access_key_stock = os.getenv("access_key_stock")
+        conn = http.client.HTTPSConnection("real-time-finance-data.p.rapidapi.com")
+        headers = {"x-rapidapi-key": access_key_stock,"x-rapidapi-host": "real-time-finance-data.p.rapidapi.com",}
+        conn.request("GET", "/market-trends?trend_type=MARKET_INDEXES&country=us&language=en", headers=headers)
+        res = conn.getresponse()
+        data = res.read()
+        json.loads(data.decode("utf-8"))
         data_json = {
             "data": {
                 "trends": [
@@ -203,3 +226,4 @@ def write_to_file(info):
     except Exception as e:
         logger.error("Невозможно записать в файл.")
         print(f"Невозможно записать в файл: {e}")
+
